@@ -15,6 +15,14 @@ const authMiddleware = (req, res, next) => {
   next(new Error('Esta es una ruta segura, no la puedes ver'))
 }
 
+const customMiddleware = (value) => (req, res, next) => {
+  console.log('customMiddleware')
+
+  if (value === 'si') return next()
+
+  next(new Error('No puedes ver esta ruta porque pusiste algo que no es un si.'))
+}
+
 // app.get('*', (req, res) => {
 //   res.status(404).send('<h1>No encontramos lo que buscabas</h1>')
 // })
@@ -29,6 +37,14 @@ app.get('/middleware', firstMiddleware, (req, res) => {
 
 app.get('/segura', authMiddleware, (req, res) => {
   res.status(200).json({ message: 'soy la ruta segura' })
+})
+
+app.get('/puedo', customMiddleware('si'), (req, res) => {
+  res.status(200).json({ message: 'soy la ruta que sí puedo' })
+})
+
+app.get('/no-puedo', customMiddleware('no'), (req, res) => {
+  res.status(200).json({ message: 'soy la ruta que no puedo' })
 })
 
 app.use('/user', userRoutes)
